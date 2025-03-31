@@ -2,34 +2,39 @@ from grammar import GrammarRules
 
 class LL1Parser:
     def __init__(self):
-        self.grammar = GrammarRules()
-        self.tokens = []
-        self.current_token_index = 0
-    
-    def parse(self, sentence):
-        self.tokens = sentence.lower().split()
-        self.tokens.append("$")  # End of input marker
-        self.current_token_index = 0
-        return self.sentence() and self.match("$")
+        self.grammar = {
+            "S": [["NP", "VP"]],
+            "NP": [["ART", "NOUN"]],
+            "VP": [["VERB", "NP"], ["VERB"]],
+        }
+        self.grammar_rules = GrammarRules()
+        self.stack = []
 
-    def match(self, expected):
-        if self.current_token_index < len(self.tokens) and self.tokens[self.current_token_index] == expected:
-            self.current_token_index += 1
-            return True
-        return False
+    def parse(self, tokens):
+        """LL(1) Parsing Implementation using Stack"""
+        self.stack = ["$", "S"]  # Start symbol
+        index = 0
 
-    def match_any(self, token_list):
-        if self.current_token_index < len(self.tokens) and self.tokens[self.current_token_index] in token_list:
-            self.current_token_index += 1
-            return True
-        return False
+        while len(self.stack) > 0:
+            top = self.stack.pop()
+            if top == tokens[index]:  # Terminal match
+                index += 1
+            elif top == "ART" and tokens[index] in self.grammar_rules.articles:
+                index += 1
+            elif top == "NOUN" and self.grammar_rules.is_noun(tokens[index]):
+                index += 1
+            elif top == "VERB" and self.grammar_rules.is_verb(tokens[index]):
+                index += 1
+            elif top in self.grammar:  # Non-terminal expansion
+                rule_found = False
+                for production in self.grammar[top]:
+                    if production[0] in ["ART", "NOUN", "VERB"] or production[0] == tokens[index]:
+                        self.stack.extend(reversed(production))
+                        rule_found = True
+                        break
+                if not rule_found:
+                    return False
+            else:
+                return False
 
-    def sentence(self):
-        return self.noun_phrase() and self.verb_phrase()
-
-    def noun_phrase(self):
-        return self.match_any(self.grammar.articles) and self.match_any(self.grammar.nouns)
-
-    def verb_phrase(self):
-        return self.match_any(self.grammar.verbs) and self.match_any(self.grammar.objects)
-
+        return index == len(tokens)
