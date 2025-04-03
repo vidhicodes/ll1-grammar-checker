@@ -1,54 +1,41 @@
 import streamlit as st
-from ll1_grammar_checker.first_follow import compute_first_follow
+from first_follow import compute_first_follow
 from parsing_table import construct_ll1_table
 from parser import parse_sentence
 from sentence_validator import validate_sentence
 
+# Compute FIRST & FOLLOW sets
+first, follow = compute_first_follow()
+
+# Compute LL(1) Parsing Table
+parsing_table = construct_ll1_table()
+
 st.set_page_config(layout="wide")
 
-# UI Title
-st.title("Grammar Checker & LL(1) Parser")
+st.title("LL(1) Grammar Checker & Parser")
 
-# Sentence Input
-sentence = st.text_input("Enter a sentence:", "")
+sentence = st.text_input("Enter a sentence:")
 
-# Buttons Layout
-col1, col2, col3, col4, col5 = st.columns(5)
-
-if col1.button("Check Sentence"):
-    if sentence:
-        result, steps = parse_sentence(sentence)
-        if result:
+if st.button("Check Sentence"):
+    if validate_sentence(sentence):
+        is_valid, steps = parse_sentence(sentence)
+        if is_valid:
             st.success("✅ Valid Sentence")
-        else:
-            st.error("❌ Invalid Sentence")
-        if steps:
             st.subheader("Parsing Steps")
             st.table(steps)
-    else:
-        st.error("Please enter a sentence.")
-
-if col2.button("Compute FIRST & FOLLOW"):
-    first_sets, follow_sets = compute_first_follow()
-    st.subheader("FIRST Sets")
-    st.json(first_sets)
-    st.subheader("FOLLOW Sets")
-    st.json(follow_sets)
-
-if col3.button("Display Parsing Table"):
-    parsing_table = construct_ll1_table()
-    st.subheader("LL(1) Parsing Table")
-    st.json(parsing_table)
-
-if col4.button("Validate Sentence Structure"):
-    if sentence:
-        is_valid = validate_sentence(sentence)
-        if is_valid:
-            st.success("✅ Sentence format is valid.")
         else:
-            st.error("❌ Invalid Sentence Format")
-    else:
-        st.error("Please enter a sentence.")
+            st.error("❌ Invalid Sentence")
 
-if col5.button("Exit"):
-    st.stop()
+if st.button("Show FIRST Sets"):
+    st.subheader("FIRST Sets")
+    st.table([(nt, ', '.join(v)) for nt, v in first.items()])
+
+if st.button("Show FOLLOW Sets"):
+    st.subheader("FOLLOW Sets")
+    st.table([(nt, ', '.join(v)) for nt, v in follow.items()])
+
+if st.button("Show Parsing Table"):
+    st.subheader("LL(1) Parsing Table")
+    table_headers = ["Non-Terminal"] + sorted(set(t for (_, t) in parsing_table.keys())) + ["$"]
+    table_rows = [[nt] + [parsing_table.get((nt, terminal), "∅") for terminal in table_headers[1:]] for nt in first.keys()]
+    st.table(table_rows)
