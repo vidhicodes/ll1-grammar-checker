@@ -1,2 +1,3 @@
-tkinter
+streamlit
 nltk
+tabulate
