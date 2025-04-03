@@ -5,6 +5,7 @@ from parser import parse_sentence
 from sentence_validator import validate_sentence
 import nltk
 nltk.download('punkt')
+nltk.download('averaged_perceptron_tagger')  # Required for POS tagging
 
 # Compute FIRST & FOLLOW sets
 first, follow = compute_first_follow()
