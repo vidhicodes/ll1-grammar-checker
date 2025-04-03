@@ -1,5 +1,5 @@
 import streamlit as st
-from first_follow import compute_first_follow
+from ll1_grammar_checker.first_follow import compute_first_follow
 from parsing_table import construct_ll1_table
 from parser import parse_sentence
 from sentence_validator import validate_sentence
