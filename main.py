@@ -3,6 +3,8 @@ from first_follow import compute_first_follow
 from parsing_table import construct_ll1_table
 from parser import parse_sentence
 from sentence_validator import validate_sentence
+import nltk
+nltk.download('punkt')
 
 # Compute FIRST & FOLLOW sets
 first, follow = compute_first_follow()
