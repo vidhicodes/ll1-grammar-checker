@@ -1,6 +1,8 @@
 import streamlit as st
-from parser_logic import compute_first_follow, construct_ll1_table, parse_sentence
-from agreement import validate_sentence
+from first_follow import compute_first_follow
+from parsing_table import construct_ll1_table
+from parser import parse_sentence
+from sentence_validator import validate_sentence
 
 st.set_page_config(layout="wide")
 
