@@ -9,3 +9,5 @@ This project implements a simple LL(1) parser to validate basic English sentence
   - **Subject + Verb + Object** (e.g., *The boy eats an apple.*)
   - **Subject + Verb** (e.g., *The dog runs.*)
 - Built with Python and Tkinter.
+
+## Run it locally and the ll1 based grammar checker will pop up to use.
